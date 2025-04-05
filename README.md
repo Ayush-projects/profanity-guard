@@ -1,6 +1,19 @@
-# Profanity Guard - Chrome Extension
+# Profanity Guard
+
+
+<img width="765" alt="image" src="https://github.com/user-attachments/assets/45f4bda0-6ff6-4c4e-b7b8-214c63d333ee" />
+
 
 A powerful Chrome extension that protects users from inappropriate content using advanced AI technology. Profanity Guard analyzes both text and images in real-time to detect and block inappropriate content, making the internet safer for everyone.
+
+
+<img width="527" alt="image" src="https://github.com/user-attachments/assets/c265b355-8052-42c2-8c1a-84b0b4b83cb6" />
+
+<img width="462" alt="image" src="https://github.com/user-attachments/assets/81aebbf7-84e6-41ae-9360-312dc5151895" />
+
+<img width="452" alt="image" src="https://github.com/user-attachments/assets/a66001b9-aa49-4697-aedd-c4612637e0d8" />
+
+
 
 ## Features
 
@@ -47,7 +60,7 @@ A powerful Chrome extension that protects users from inappropriate content using
 
 1. Get a Google Cloud API key:
 
-   - Go to [Google Cloud Console](https://console.cloud.google.com)
+   - Go to [Google AI Studio]([https://console.cloud.google.com](https://aistudio.google.com/))
    - Create a new project or select an existing one
    - Enable the Gemini API
    - Create credentials (API key)
