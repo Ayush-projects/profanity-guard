@@ -1,9 +1,9 @@
 # Profanity Guard
 
+---
 
 <img width="765" alt="image" src="https://github.com/user-attachments/assets/45f4bda0-6ff6-4c4e-b7b8-214c63d333ee" />
 
----
 
 ---
 
