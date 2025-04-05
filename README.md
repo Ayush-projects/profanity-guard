@@ -7,7 +7,8 @@
 A powerful Chrome extension that protects users from inappropriate content using advanced AI technology. Profanity Guard analyzes both text and images in real-time to detect and block inappropriate content, making the internet safer for everyone.
 
 
-<img width="527" alt="image" src="https://github.com/user-attachments/assets/c265b355-8052-42c2-8c1a-84b0b4b83cb6" />
+<img width="420" alt="image" src="https://github.com/user-attachments/assets/adc6ed68-cbcd-4588-bbcb-b95b1e2b2040" />
+
 
 <img width="462" alt="image" src="https://github.com/user-attachments/assets/81aebbf7-84e6-41ae-9360-312dc5151895" />
 
