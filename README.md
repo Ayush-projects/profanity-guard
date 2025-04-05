@@ -9,12 +9,9 @@ A powerful Chrome extension that protects users from inappropriate content using
 <img width="1428" alt="image" src="https://github.com/user-attachments/assets/df2e1f90-6ec0-4eb7-8f8c-88df3eb2c5b7" />
 
 
-<img width="420" alt="image" src="https://github.com/user-attachments/assets/adc6ed68-cbcd-4588-bbcb-b95b1e2b2040" />
 
 
-<img width="462" alt="image" src="https://github.com/user-attachments/assets/81aebbf7-84e6-41ae-9360-312dc5151895" />
-
-<img width="452" alt="image" src="https://github.com/user-attachments/assets/a66001b9-aa49-4697-aedd-c4612637e0d8" />
+<div style="display: flex; justify-content: space-between; gap: 10px;"> <img src="https://github.com/user-attachments/assets/adc6ed68-cbcd-4588-bbcb-b95b1e2b2040" alt="Screenshot 1" style="width: 33%; height: auto;" /> <img src="https://github.com/user-attachments/assets/81aebbf7-84e6-41ae-9360-312dc5151895" alt="Screenshot 2" style="width: 33%; height: auto;" /> <img src="https://github.com/user-attachments/assets/a66001b9-aa49-4697-aedd-c4612637e0d8" alt="Screenshot 3" style="width: 33%; height: auto;" /> </div> 
 
 
 
