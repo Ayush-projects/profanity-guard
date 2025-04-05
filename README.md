@@ -20,7 +20,6 @@ A powerful Chrome extension that protects users from inappropriate content using
 
 ### Real-time Content Protection
 
-- Text Analysis: Instantly analyzes webpage text for inappropriate content
 - Image Analysis: Uses Google's Gemini AI to detect inappropriate images
 - Screenshot Analysis: Takes screenshots of pages to analyze visual content
 - Smart Blocking: Automatically blocks pages with inappropriate content
@@ -135,19 +134,6 @@ profanity-guard/
 └── README.md
 ```
 
-### Building from Source
-
-1. Install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-2. Build the extension:
-
-   ```bash
-   npm run build
-   ```
 
 3. Load the built extension in Chrome
 
