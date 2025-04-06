@@ -17,6 +17,13 @@ const takeScreenshotBtn = document.getElementById("take-screenshot");
 
 // Initialize popup
 function initializePopup() {
+  // Initialize activities array if it doesn't exist
+  chrome.storage.sync.get(["activities"], function (items) {
+    if (!items.activities) {
+      chrome.storage.sync.set({ activities: [] });
+    }
+  });
+
   // Load settings
   loadSettings();
 
@@ -87,14 +94,11 @@ function loadStatistics() {
 function loadActivities() {
   chrome.storage.sync.get(["activities"], function (items) {
     const activities = items.activities || [];
-
-    // Clear activity list
     activityList.innerHTML = "";
 
     if (activities.length === 0) {
-      // Show empty state
       activityList.innerHTML = `
-        <div class="empty-activity">
+        <div class="empty-state">
           <i class="fas fa-history"></i>
           <p>No activities yet</p>
         </div>
@@ -102,21 +106,27 @@ function loadActivities() {
       return;
     }
 
-    // Add activities to list
+    // Sort activities by timestamp (newest first)
+    activities.sort((a, b) => b.timestamp - a.timestamp);
+
     activities.forEach((activity) => {
       const activityItem = document.createElement("div");
       activityItem.className = `activity-item ${activity.type}`;
 
+      // Format the timestamp
+      const date = new Date(activity.timestamp);
+      const timeString = date.toLocaleTimeString();
+      const dateString = date.toLocaleDateString();
+
       activityItem.innerHTML = `
-        <div class="activity-icon ${activity.type}">
-          <i class="fas fa-${activity.icon}"></i>
+        <div class="activity-icon">
+          <span>${activity.icon}</span>
         </div>
-        <div class="activity-details">
+        <div class="activity-content">
           <div class="activity-title">${activity.title}</div>
-          <div class="activity-time">${activity.time}</div>
+          <div class="activity-time">${dateString} ${timeString}</div>
         </div>
       `;
-
       activityList.appendChild(activityItem);
     });
   });
@@ -240,7 +250,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         title: request.title,
         icon: request.icon,
         type: request.type,
-        time: new Date().toLocaleTimeString(),
+        timestamp: request.timestamp || Date.now(),
       });
 
       // Limit number of activities
@@ -249,19 +259,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
 
       // Save activities
-      chrome.storage.sync.set({ activities: activities });
-
-      // Reload activities if on activity tab
-      if (
-        document.getElementById("activity-tab").classList.contains("active")
-      ) {
-        loadActivities();
-      }
-
-      // Reload statistics if on stats tab
-      if (document.getElementById("stats-tab").classList.contains("active")) {
-        loadStatistics();
-      }
+      chrome.storage.sync.set({ activities: activities }, function () {
+        // Reload activities if we're on the activity tab
+        if (
+          document.getElementById("activity-tab").classList.contains("active")
+        ) {
+          loadActivities();
+        }
+      });
     });
   }
 });

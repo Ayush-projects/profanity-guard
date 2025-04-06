@@ -10,8 +10,12 @@
     "tabs"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "<all_urls>",
+    "wss://generativelanguage.googleapis.com/*"
   ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' wss://generativelanguage.googleapis.com/"
+  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -26,8 +30,8 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["config.js", "content.js", "screenshot.js"],
-      "css": ["styles.css"]
+      "js": ["config.js", "websocket.js", "content.js"],
+      "css": ["fonts.css", "styles.css"]
     }
   ],
   "icons": {

@@ -16,7 +16,5 @@ const CONFIG = {
   ENABLE_GUARD_BY_DEFAULT: true,
 };
 
-// Export the config object
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = CONFIG;
-}
+// Make the config object available globally for Chrome extensions
+window.CONFIG = CONFIG;

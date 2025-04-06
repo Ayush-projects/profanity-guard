@@ -38,20 +38,20 @@ function initializeGeminiClient(apiKey) {
 
 // Clean up old activities (older than 24 hours)
 function cleanOldActivities() {
-  chrome.storage.sync.get(["activityLog"], function (items) {
-    if (!items.activityLog || items.activityLog.length === 0) return;
+  chrome.storage.sync.get(["activities"], function (items) {
+    if (!items.activities || items.activities.length === 0) return;
 
     const now = new Date().getTime();
     const oneDayAgo = now - 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
     // Filter out activities older than 24 hours
-    const filteredActivities = items.activityLog.filter(
+    const filteredActivities = items.activities.filter(
       (activity) => activity.timestamp > oneDayAgo
     );
 
     // If we removed any activities, update storage
-    if (filteredActivities.length !== items.activityLog.length) {
-      chrome.storage.sync.set({ activityLog: filteredActivities });
+    if (filteredActivities.length !== items.activities.length) {
+      chrome.storage.sync.set({ activities: filteredActivities });
     }
   });
 }
@@ -164,12 +164,13 @@ chrome.runtime.onInstalled.addListener(() => {
 
   // Set default values
   chrome.storage.sync.get(
-    ["enableGuard", "apiKey", "blocksCount", "scanTime"],
+    ["enableGuard", "apiKey", "blocksCount", "scanTime", "activities"],
     function (items) {
       const defaults = {
         enableGuard: true, // Enable guard by default
         blocksCount: 0,
         scanTime: 0,
+        activities: [], // Initialize empty activities array
       };
 
       // Only set values that don't exist yet

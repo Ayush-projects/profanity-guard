@@ -1,7 +1,9 @@
 // Content script for Profanity Guard
+// No import statement needed, using global GeminiWebSocket class
 
 let isEnabled = true;
 let lastScanTime = 0; // Initialize to 0 to ensure first scan runs immediately
+let geminiWs = null;
 
 // Initialize the content guard
 function initializeGuard() {
@@ -22,6 +24,13 @@ function initializeGuard() {
           lastScanTime,
           "(0 means no scans yet)"
         );
+
+        // Initialize WebSocket connection
+        if (!geminiWs) {
+          geminiWs = new window.GeminiWebSocket(items.apiKey);
+          geminiWs.connect();
+        }
+
         startContentGuard(scanInterval);
       }
     }
@@ -36,24 +45,24 @@ function showBlockOverlay(reason) {
   const message = document.createElement("div");
   message.className = "block-message";
 
-  // Create a more professional message without showing the specific content
   message.innerHTML = `
     <div class="block-icon">
       <i class="fas fa-shield-alt"></i>
     </div>
     <h2>Content Blocked</h2>
     <p>We've detected content that may be inappropriate or harmful.</p>
-    <p>This content has been blocked to ensure a safe browsing experience.</p>
+    <p>${
+      reason
+        ? `Reason: ${reason}`
+        : "This content has been blocked to ensure a safe browsing experience."
+    }</p>
     <p class="block-timestamp">Blocked at: ${new Date().toLocaleTimeString()}</p>
   `;
 
   overlay.appendChild(message);
   document.body.appendChild(overlay);
-
-  // Prevent scrolling
   document.body.style.overflow = "hidden";
 
-  // Add a danger icon in the center of the overlay
   const dangerIcon = document.createElement("div");
   dangerIcon.className = "danger-icon";
   dangerIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
@@ -65,13 +74,11 @@ async function captureScreenshot() {
   try {
     console.log("Profanity Guard: Capturing screenshot...");
 
-    // Use chrome.tabs.captureVisibleTab to take a screenshot
     return new Promise((resolve) => {
       try {
         chrome.runtime.sendMessage(
           { action: "captureVisibleTab" },
           (response) => {
-            // Check if the extension context is still valid
             if (chrome.runtime.lastError) {
               console.error(
                 "Profanity Guard: Error capturing screenshot:",
@@ -107,89 +114,42 @@ async function captureScreenshot() {
   }
 }
 
-// Analyze screenshot using Gemini API
+// Analyze screenshot using WebSocket
 async function analyzeScreenshot(screenshotDataUrl) {
   try {
-    console.log("Profanity Guard: Analyzing screenshot with Gemini...");
+    console.log("Profanity Guard: Analyzing screenshot with WebSocket...");
 
-    const { apiKey } = await chrome.storage.sync.get(["apiKey"]);
-    if (!apiKey) {
-      console.error("Profanity Guard: No API key found");
-      return null;
+    // Convert data URL to File object
+    const response = await fetch(screenshotDataUrl);
+    const blob = await response.blob();
+    const file = new File([blob], "screenshot.jpg", { type: "image/jpeg" });
+
+    const analysis = await geminiWs.analyzeImage(file);
+    console.log("Profanity Guard: Screenshot analyzed successfully");
+
+    // Extract the analysis result from the response
+    const analysisText = analysis.candidates[0].content.parts[0].text;
+    let result;
+    try {
+      result = JSON.parse(analysisText);
+    } catch (e) {
+      console.error("Profanity Guard: Error parsing analysis result:", e);
+      return {
+        isInappropriate: false,
+        confidence: 0.5,
+        reason: "Error parsing analysis result",
+      };
     }
 
-    // Send the screenshot to the background script for analysis
-    return new Promise((resolve) => {
-      chrome.runtime.sendMessage(
-        {
-          action: "captureVisibleTab",
-          analyze: true,
-        },
-        (response) => {
-          if (chrome.runtime.lastError) {
-            console.error(
-              "Profanity Guard: Error analyzing screenshot:",
-              chrome.runtime.lastError.message
-            );
-            resolve(null);
-            return;
-          }
-
-          if (response && response.analysis) {
-            console.log("Profanity Guard: Screenshot analyzed successfully");
-
-            // Extract the JSON response from Gemini's text
-            try {
-              // Find the text part in the response
-              const textPart =
-                response.analysis.candidates[0].content.parts.find(
-                  (part) => part.text
-                );
-
-              if (textPart && textPart.text) {
-                // Try to parse the text as JSON
-                const jsonMatch = textPart.text.match(/\{.*\}/s);
-                if (jsonMatch) {
-                  const jsonStr = jsonMatch[0];
-                  const result = JSON.parse(jsonStr);
-                  resolve(result);
-                  return;
-                }
-              }
-
-              // If we couldn't parse JSON, create a default response
-              resolve({
-                isInappropriate: false,
-                confidence: 0.5,
-                reason: "Could not parse analysis result",
-              });
-            } catch (error) {
-              console.error(
-                "Profanity Guard: Error parsing analysis result:",
-                error
-              );
-              resolve({
-                isInappropriate: false,
-                confidence: 0.5,
-                reason: "Error parsing analysis result",
-              });
-            }
-          } else if (response && response.error) {
-            console.error(
-              "Profanity Guard: Error from background script:",
-              response.error
-            );
-            resolve(null);
-          } else {
-            console.error("Profanity Guard: Failed to analyze screenshot");
-            resolve(null);
-          }
-        }
-      );
-    });
+    console.log("Profanity Guard: Analysis result:", result);
+    return result;
   } catch (error) {
     console.error("Profanity Guard: Error analyzing screenshot:", error);
-    return null;
+    return {
+      isInappropriate: false,
+      confidence: 0.5,
+      reason: "Error analyzing content",
+    };
   }
 }
 
@@ -206,19 +166,64 @@ function updateBlockCount() {
       newCount
     );
 
+    // Update block count
     chrome.storage.sync.set({ blocksCount: newCount }, function () {
       console.log("Profanity Guard: Block count updated successfully");
     });
+
+    // Log activity with timestamp
+    chrome.runtime.sendMessage({
+      action: "addActivity",
+      title: "Content Blocked",
+      icon: "🛡️",
+      type: "block",
+      timestamp: Date.now(),
+    });
   });
+}
+
+// Check if content is already blocked
+function isContentBlocked() {
+  return document.querySelector(".profanity-block-overlay") !== null;
+}
+
+// Disconnect WebSocket if content is blocked
+function handleBlockedContent() {
+  if (isContentBlocked()) {
+    console.log("Profanity Guard: Content blocked, disconnecting WebSocket");
+    if (geminiWs) {
+      geminiWs.disconnect();
+      geminiWs = null;
+    }
+    // Clear the interval since we don't need to scan anymore
+    if (window.contentGuardInterval) {
+      clearInterval(window.contentGuardInterval);
+      window.contentGuardInterval = null;
+    }
+  }
 }
 
 // Start content guard
 function startContentGuard(scanInterval) {
   console.log("Profanity Guard: Starting content guard...");
 
-  setInterval(async () => {
+  // Clear any existing interval
+  if (window.contentGuardInterval) {
+    clearInterval(window.contentGuardInterval);
+  }
+
+  // Create new interval
+  window.contentGuardInterval = setInterval(async () => {
+    // Skip if guard is disabled
     if (!isEnabled) {
       console.log("Profanity Guard: Guard is disabled, skipping scan");
+      return;
+    }
+
+    // Skip if content is already blocked
+    if (isContentBlocked()) {
+      console.log("Profanity Guard: Content already blocked, skipping scan");
+      handleBlockedContent();
       return;
     }
 
@@ -248,9 +253,7 @@ function startContentGuard(scanInterval) {
     // Capture screenshot
     const screenshot = await captureScreenshot();
     if (!screenshot) {
-      console.error(
-        "Profanity Guard: Failed to capture screenshot, skipping analysis"
-      );
+      console.error("Profanity Guard: Failed to capture screenshot");
       return;
     }
 
@@ -261,31 +264,20 @@ function startContentGuard(scanInterval) {
       return;
     }
 
-    // Only block if confidence is above threshold
+    console.log("Profanity Guard: Analysis result:", analysis);
+
+    // Check if content is inappropriate
     if (
       analysis.isInappropriate &&
       analysis.confidence >= CONFIG.MIN_CONFIDENCE
     ) {
-      // Update block count first
+      console.log(
+        "Profanity Guard: Inappropriate content detected:",
+        analysis.reason
+      );
+      showBlockOverlay(analysis.reason);
       updateBlockCount();
-
-      // Add activity log
-      chrome.runtime.sendMessage({
-        action: "addActivity",
-        title: "Inappropriate content detected",
-        icon: "ban",
-        type: "warning",
-      });
-
-      // Show block overlay
-      showBlockOverlay(analysis.reason || "Inappropriate content detected");
-    } else {
-      chrome.runtime.sendMessage({
-        action: "addActivity",
-        title: "Content scan completed",
-        icon: "check-circle",
-        type: "success",
-      });
+      handleBlockedContent();
     }
   }, scanInterval);
 }
@@ -313,4 +305,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // Initialize when the script loads
 console.log("Profanity Guard: Content script loaded");
+
+// Cleanup function
+function cleanup() {
+  if (geminiWs) {
+    geminiWs.disconnect();
+    geminiWs = null;
+  }
+}
+
+// Add cleanup on extension unload
+window.addEventListener("unload", cleanup);
+
+// Initialize the guard
 initializeGuard();

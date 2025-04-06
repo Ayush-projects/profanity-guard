@@ -305,76 +305,69 @@
 .profanity-guard-popup .activity-item {
   display: flex;
   align-items: center;
-  gap: 12px;
   padding: 12px;
-  background-color: var(--card-background);
-  border-radius: var(--radius-md);
-  margin-bottom: 8px;
-  transition: all 0.2s ease;
-  border: 1px solid var(--border-color);
-  border-left: 3px solid var(--primary-color);
-}
-
-.profanity-guard-popup .activity-item.warning {
-  border-left-color: var(--warning-color);
+  border-bottom: 1px solid var(--border-color);
+  animation: fadeIn 0.3s ease;
+  transition: background-color 0.2s ease;
 }
 
 .profanity-guard-popup .activity-item:hover {
-  transform: translateX(4px);
-  border-color: var(--primary-light);
-  box-shadow: var(--shadow-sm);
+  background-color: var(--hover-bg);
+}
+
+.profanity-guard-popup .activity-item.block {
+  border-left: 3px solid var(--danger-color);
 }
 
 .profanity-guard-popup .activity-icon {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background-color: var(--primary-color);
-  color: white;
+  background: var(--primary-color);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  flex-shrink: 0;
+  margin-right: 12px;
+  font-size: 1.2rem;
+  color: white;
 }
 
-.profanity-guard-popup .activity-icon.warning {
-  background-color: var(--warning-color);
+.profanity-guard-popup .activity-item.block .activity-icon {
+  background: var(--danger-color);
 }
 
-.profanity-guard-popup .activity-details {
+.profanity-guard-popup .activity-content {
   flex: 1;
-  min-width: 0; /* Prevent text overflow */
 }
 
 .profanity-guard-popup .activity-title {
   font-weight: 500;
-  margin-bottom: 2px;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--text-color);
+  margin-bottom: 4px;
 }
 
 .profanity-guard-popup .activity-time {
-  font-size: 12px;
+  font-size: 0.8rem;
   color: var(--text-secondary);
 }
 
-.profanity-guard-popup .empty-activity {
-  text-align: center;
-  padding: 24px;
-  color: var(--text-secondary);
-  font-size: 14px;
+.profanity-guard-popup .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  padding: 32px;
+  color: var(--text-secondary);
 }
 
-.profanity-guard-popup .empty-activity i {
-  font-size: 24px;
-  color: var(--border-color);
+.profanity-guard-popup .empty-state i {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.profanity-guard-popup .empty-state p {
+  margin: 0;
+  font-size: 0.9rem;
 }
 
 .profanity-guard-popup .input-group {
