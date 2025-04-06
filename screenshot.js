@@ -3,21 +3,13 @@
 // Function to capture the current tab and show it in a new tab
 async function captureAndShowScreenshot() {
   try {
-    console.log("Profanity Guard: Capturing screenshot for display...");
-
     // Send message to background script to capture the tab
     chrome.runtime.sendMessage({ action: "captureVisibleTab" }, (response) => {
       if (chrome.runtime.lastError) {
-        console.error(
-          "Profanity Guard: Error capturing screenshot:",
-          chrome.runtime.lastError.message
-        );
         return;
       }
 
       if (response && response.dataUrl) {
-        console.log("Profanity Guard: Screenshot captured successfully");
-
         // Create a new tab with the screenshot
         const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
         const html = `
@@ -166,5 +158,5 @@ function initializeScreenshotFeature() {
 }
 
 // Initialize when the script loads
-console.log("Profanity Guard: Screenshot feature initialized");
+
 initializeScreenshotFeature();
