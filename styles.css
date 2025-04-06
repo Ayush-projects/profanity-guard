@@ -305,30 +305,35 @@
 .profanity-guard-popup .activity-item {
   display: flex;
   align-items: center;
-  padding: 12px;
+  padding: 16px;
   border-bottom: 1px solid var(--border-color);
   animation: fadeIn 0.3s ease;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  background: var(--bg-color);
+  border-radius: 8px;
+  margin: 8px 0;
 }
 
 .profanity-guard-popup .activity-item:hover {
   background-color: var(--hover-bg);
+  transform: translateX(4px);
 }
 
 .profanity-guard-popup .activity-item.block {
-  border-left: 3px solid var(--danger-color);
+  border-left: 4px solid var(--danger-color);
+  background: rgba(var(--danger-rgb), 0.05);
 }
 
 .profanity-guard-popup .activity-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
   background: var(--primary-color);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 12px;
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: white;
 }
 
@@ -338,17 +343,27 @@
 
 .profanity-guard-popup .activity-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .profanity-guard-popup .activity-title {
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-color);
-  margin-bottom: 4px;
+  font-size: 0.95rem;
 }
 
 .profanity-guard-popup .activity-time {
   font-size: 0.8rem;
   color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.profanity-guard-popup .activity-time i {
+  font-size: 0.9rem;
 }
 
 .profanity-guard-popup .empty-state {
@@ -629,13 +644,13 @@
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 0 0 rgba(var(--danger-rgb), 0.4);
   }
   70% {
-    box-shadow: 0 0 0 15px rgba(59, 130, 246, 0);
+    box-shadow: 0 0 0 6px rgba(var(--danger-rgb), 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    box-shadow: 0 0 0 0 rgba(var(--danger-rgb), 0);
   }
 }
 

@@ -149,6 +149,40 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     );
     return true; // Required for async response
   }
+
+  // Handle addActivity message from content script
+  if (request.action === "addActivity") {
+    console.log("Profanity Guard: Adding activity:", request);
+
+    // Add activity to storage
+    chrome.storage.sync.get(["activities"], function (items) {
+      const activities = items.activities || [];
+
+      // Add new activity
+      activities.unshift({
+        title: request.title,
+        icon: request.icon,
+        type: request.type,
+        timestamp: request.timestamp || Date.now(),
+      });
+
+      // Limit number of activities
+      if (activities.length > 100) {
+        // Use a reasonable limit
+        activities.pop();
+      }
+
+      // Save activities
+      chrome.storage.sync.set({ activities: activities }, function () {
+        console.log("Profanity Guard: Activity saved successfully");
+
+        // Notify any open popups to refresh their activity list
+        chrome.runtime.sendMessage({ action: "refreshActivities" });
+      });
+    });
+
+    return true;
+  }
 });
 
 // Listen for API key updates

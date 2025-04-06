@@ -172,13 +172,26 @@ function updateBlockCount() {
     });
 
     // Log activity with timestamp
-    chrome.runtime.sendMessage({
-      action: "addActivity",
-      title: "Content Blocked",
-      icon: "🛡️",
-      type: "block",
-      timestamp: Date.now(),
-    });
+    console.log("Profanity Guard: Sending activity message");
+    chrome.runtime.sendMessage(
+      {
+        action: "addActivity",
+        title: "Content Blocked",
+        icon: "🛡️",
+        type: "block",
+        timestamp: Date.now(),
+      },
+      function (response) {
+        if (chrome.runtime.lastError) {
+          console.error(
+            "Profanity Guard: Error sending activity message:",
+            chrome.runtime.lastError.message
+          );
+        } else {
+          console.log("Profanity Guard: Activity message sent successfully");
+        }
+      }
+    );
   });
 }
 

@@ -269,6 +269,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       });
     });
   }
+
+  // Listen for refresh message from background script
+  if (request.action === "refreshActivities") {
+    console.log("Profanity Guard: Refreshing activities in popup");
+    loadActivities();
+  }
 });
 
 // Initialize popup when DOM is loaded
